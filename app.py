@@ -17,22 +17,24 @@ def generate_password(length, use_upper, use_lower, use_digits, use_symbols):
 
     if not characters:
         return "Будь ласка, оберіть хоча б один тип символів."
-    else:
-        password = ''.join(random.choice(characters) for _ in range(length))
-        return password
+
+    password = ''.join(random.choice(characters) for _ in range(length))
+    return password
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        length = int(request.form['length'])
-        use_upper = 'upper' in request.form
-        use_lower = 'lower' in request.form
-        use_digits = 'digits' in request.form
-        use_symbols = 'symbols' in request.form
+        length = int(request.form.get('length', 12))
+        use_upper = bool(request.form.get('upper'))
+        use_lower = bool(request.form.get('lower'))
+        use_digits = bool(request.form.get('digits'))
+        use_symbols = bool(request.form.get('symbols'))
 
         passwords = [generate_password(length, use_upper, use_lower, use_digits, use_symbols) for _ in range(20)]
-        return jsonify(passwords)  # Повертаємо JSON-відповідь
-    return render_template('index.html')
+        return render_template('index.html', passwords=passwords)
+
+    return render_template('index.html', passwords=None)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
